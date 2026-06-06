@@ -5,7 +5,7 @@ import type { AppStore } from '../store/useAppStore';
 import { TodoCard } from './TodoCard';
 
 const PRIORITY_OPTIONS = ['all', 'high', 'medium', 'low'] as const;
-const CATEGORY_OPTIONS = ['all', 'work', 'personal', 'health', 'learning', 'other'] as const;
+const CATEGORY_OPTIONS = ['all', 'meeting', 'documentation', 'testing', 'distribution', 'research', 'prototyping'] as const;
 const STATUS_OPTIONS = ['all', 'active', 'completed'] as const;
 
 export function TodoList({ store }: { store: AppStore }) {

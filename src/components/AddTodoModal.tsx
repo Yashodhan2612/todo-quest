@@ -6,11 +6,12 @@ import type { Priority, Category } from '../types';
 import { xpForPriority } from '../utils/badges';
 
 const CATEGORIES: { value: Category; icon: string; label: string }[] = [
-  { value: 'work', icon: '💼', label: 'Work' },
-  { value: 'personal', icon: '🏠', label: 'Personal' },
-  { value: 'health', icon: '💪', label: 'Health' },
-  { value: 'learning', icon: '📚', label: 'Learning' },
-  { value: 'other', icon: '✨', label: 'Other' },
+  { value: 'meeting', icon: '🤝', label: 'Meeting' },
+  { value: 'documentation', icon: '📄', label: 'Docs' },
+  { value: 'testing', icon: '🧪', label: 'Testing' },
+  { value: 'distribution', icon: '📦', label: 'Distribution' },
+  { value: 'research', icon: '🔬', label: 'Research' },
+  { value: 'prototyping', icon: '🛠️', label: 'Prototyping' },
 ];
 
 const PRIORITIES: { value: Priority; label: string; color: string; bg: string }[] = [
@@ -26,7 +27,7 @@ export function AddTodoModal({ store }: { store: AppStore }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
-  const [category, setCategory] = useState<Category>('work');
+  const [category, setCategory] = useState<Category>('research');
   const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function AddTodoModal({ store }: { store: AppStore }) {
       setTitle('');
       setDescription('');
       setPriority('medium');
-      setCategory('work');
+      setCategory('research');
       setDueDate('');
     }
   }, [editingTodo, store.showAddModal]);

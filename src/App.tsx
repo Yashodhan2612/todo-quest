@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useAppStore } from './store/useAppStore';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
@@ -8,6 +10,8 @@ import { CalendarView } from './components/CalendarView';
 import { Achievements } from './components/Achievements';
 import { AddTodoModal } from './components/AddTodoModal';
 import { XpToast, BadgeToast } from './components/XpToast';
+import { KeyboardShortcuts } from './components/KeyboardShortcuts';
+import { AuthPage } from './pages/AuthPage';
 import { ALL_BADGES } from './utils/badges';
 
 function Particles({ count = 14 }: { count?: number }) {
@@ -24,24 +28,17 @@ function Particles({ count = 14 }: { count?: number }) {
             top: `${Math.random() * 100}%`,
             background: `rgba(${139 + Math.floor(Math.random() * 60)},${92 + Math.floor(Math.random() * 60)},246,${0.3 + Math.random() * 0.4})`,
           }}
-          animate={{
-            y: [0, -30 - Math.random() * 40, 0],
-            opacity: [0, 0.8, 0],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 4,
-            repeat: Infinity,
-            delay: Math.random() * 6,
-            ease: 'easeInOut',
-          }}
+          animate={{ y: [0, -30 - Math.random() * 40, 0], opacity: [0, 0.8, 0] }}
+          transition={{ duration: 4 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 6, ease: 'easeInOut' }}
         />
       ))}
     </div>
   );
 }
 
-export default function App() {
-  const store = useAppStore();
+function MainApp() {
+  const { user, userName } = useAuth();
+  const store = useAppStore(user!.id);
 
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });
   const [badgeToast, setBadgeToast] = useState({ visible: false, icon: '', name: '' });
@@ -49,9 +46,7 @@ export default function App() {
 
   const showNextBadge = useCallback(() => {
     const next = badgeQueue.current.shift();
-    if (next) {
-      setBadgeToast({ visible: true, ...next });
-    }
+    if (next) setBadgeToast({ visible: true, ...next });
   }, []);
 
   const handleCompleteTodo = useCallback(
@@ -59,11 +54,12 @@ export default function App() {
       const { newBadges, xpGained } = store.completeTodo(id);
       setXpToast({ visible: true, amount: xpGained });
       if (newBadges.length > 0) {
-        const toQueue = newBadges.map((bid) => {
-          const b = ALL_BADGES.find((x) => x.id === bid);
-          return { icon: b?.icon ?? '🏆', name: b?.name ?? bid };
-        });
-        badgeQueue.current.push(...toQueue);
+        badgeQueue.current.push(
+          ...newBadges.map((bid) => {
+            const b = ALL_BADGES.find((x) => x.id === bid);
+            return { icon: b?.icon ?? '🏆', name: b?.name ?? bid };
+          })
+        );
         setTimeout(showNextBadge, 800);
       }
     },
@@ -72,18 +68,34 @@ export default function App() {
 
   const storeWithToasts = { ...store, completeTodo: handleCompleteTodo };
 
+  if (store.loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Particles />
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl float"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', boxShadow: '0 0 40px rgba(139,92,246,0.5)' }}>
+            ⚔️
+          </div>
+          <div className="flex items-center gap-2 text-purple-300">
+            <Loader2 size={16} className="animate-spin" />
+            Loading your quests...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex">
       <Particles />
-
       <div className="relative z-10 flex w-full max-w-7xl mx-auto px-4 py-6 gap-6">
         <Sidebar store={storeWithToasts as typeof store} />
-
         <main className="flex-1 min-w-0 overflow-y-auto pb-6">
           <AnimatePresence mode="wait">
             {store.activeView === 'dashboard' && (
               <motion.div key="dashboard" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                <Dashboard store={storeWithToasts as typeof store} />
+                <Dashboard store={storeWithToasts as typeof store} userName={userName} />
               </motion.div>
             )}
             {store.activeView === 'todos' && (
@@ -106,13 +118,13 @@ export default function App() {
       </div>
 
       <AddTodoModal store={storeWithToasts as typeof store} />
+      <KeyboardShortcuts store={storeWithToasts as typeof store} />
 
       <XpToast
         amount={xpToast.amount}
         visible={xpToast.visible}
         onDone={() => setXpToast((s) => ({ ...s, visible: false }))}
       />
-
       <BadgeToast
         badgeIcon={badgeToast.icon}
         badgeName={badgeToast.name}
@@ -123,5 +135,33 @@ export default function App() {
         }}
       />
     </div>
+  );
+}
+
+function AppRouter() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl float"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', boxShadow: '0 0 40px rgba(139,92,246,0.5)' }}>
+            ⚔️
+          </div>
+          <Loader2 size={18} className="animate-spin text-purple-400" />
+        </div>
+      </div>
+    );
+  }
+
+  return user ? <MainApp /> : <AuthPage />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   );
 }

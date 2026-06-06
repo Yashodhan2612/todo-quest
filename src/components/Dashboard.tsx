@@ -4,7 +4,7 @@ import type { AppStore } from '../store/useAppStore';
 import { levelFromXp, ALL_BADGES } from '../utils/badges';
 import { format } from 'date-fns';
 
-export function Dashboard({ store }: { store: AppStore }) {
+export function Dashboard({ store, userName }: { store: AppStore; userName: string }) {
   const { level, currentXp, neededXp } = levelFromXp(store.game.xp);
   const xpPct = Math.min((currentXp / neededXp) * 100, 100);
   const today = new Date().toISOString().split('T')[0];
@@ -25,7 +25,7 @@ export function Dashboard({ store }: { store: AppStore }) {
       <motion.div variants={item} className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            Good {getGreeting()}, Adventurer! 👋
+            Good {getGreeting()}, {userName}! 👋
           </h1>
           <p className="text-purple-300 text-sm mt-1">
             {format(new Date(), 'EEEE, MMMM d, yyyy')}
@@ -240,7 +240,11 @@ function MiniTodoRow({
 }
 
 function getGreeting(): string {
-  const h = new Date().getHours();
+  // Use Intl to get the current hour in the user's local timezone
+  const hourStr = new Intl.DateTimeFormat(undefined, { hour: 'numeric', hour12: false, timeZoneName: 'short' })
+    .formatToParts(new Date())
+    .find((p) => p.type === 'hour')?.value ?? String(new Date().getHours());
+  const h = parseInt(hourStr, 10);
   if (h < 12) return 'morning';
   if (h < 17) return 'afternoon';
   return 'evening';

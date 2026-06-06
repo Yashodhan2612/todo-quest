@@ -12,11 +12,12 @@ interface Props {
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
-  work: '💼',
-  personal: '🏠',
-  health: '💪',
-  learning: '📚',
-  other: '✨',
+  meeting: '🤝',
+  documentation: '📄',
+  testing: '🧪',
+  distribution: '📦',
+  research: '🔬',
+  prototyping: '🛠️',
 };
 
 const PRIORITY_LABEL: Record<string, { label: string; color: string; bg: string }> = {

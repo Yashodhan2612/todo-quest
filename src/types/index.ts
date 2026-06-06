@@ -1,6 +1,6 @@
 export type Priority = 'high' | 'medium' | 'low';
 export type TodoStatus = 'active' | 'completed';
-export type Category = 'work' | 'personal' | 'health' | 'learning' | 'other';
+export type Category = 'meeting' | 'documentation' | 'testing' | 'distribution' | 'research' | 'prototyping';
 
 export interface Todo {
   id: string;
@@ -9,10 +9,11 @@ export interface Todo {
   priority: Priority;
   category: Category;
   status: TodoStatus;
-  dueDate?: string; // ISO date string YYYY-MM-DD
+  dueDate?: string; // YYYY-MM-DD
   createdAt: string; // ISO datetime
   completedAt?: string; // ISO datetime
   xpReward: number;
+  xpGained?: number; // actual XP awarded at completion time (includes streak bonus)
 }
 
 export interface Badge {
@@ -54,4 +55,5 @@ export interface AppState {
   };
   showAddModal: boolean;
   editingTodo?: string;
+  loading: boolean;
 }
