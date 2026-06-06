@@ -137,7 +137,7 @@ export function useAppStore(userId: string) {
     if (updates.category !== undefined) dbUpdates.category = updates.category;
     if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate ?? null;
 
-    await supabase.from('todos').update(dbUpdates).eq('id', id);
+    await supabase.from('todos').update(dbUpdates).eq('id', id).eq('user_id', userId);
 
     setState((s) => ({
       ...s,
@@ -148,7 +148,7 @@ export function useAppStore(userId: string) {
   }, [userId]);
 
   const deleteTodo = useCallback(async (id: string) => {
-    await supabase.from('todos').delete().eq('id', id);
+    await supabase.from('todos').delete().eq('id', id).eq('user_id', userId);
     setState((s) => ({ ...s, todos: s.todos.filter((t) => t.id !== id) }));
   }, [userId]);
 
@@ -205,7 +205,7 @@ export function useAppStore(userId: string) {
         status: 'completed',
         completed_at: now,
         xp_gained: xp,
-      }).eq('id', id).then(() => {});
+      }).eq('id', id).eq('user_id', userId).then(() => {});
       syncGame(finalGame);
 
       return { ...s, todos: updatedTodos, game: finalGame };
@@ -254,7 +254,7 @@ export function useAppStore(userId: string) {
         status: 'active',
         completed_at: null,
         xp_gained: null,
-      }).eq('id', id).then(() => {});
+      }).eq('id', id).eq('user_id', userId).then(() => {});
       syncGame(newGame);
 
       return { ...s, todos: updatedTodos, game: newGame };

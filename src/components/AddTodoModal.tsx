@@ -128,6 +128,8 @@ export function AddTodoModal({ store }: { store: AppStore }) {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="What do you need to accomplish?"
                     autoFocus
+                    maxLength={200}
+                    autoComplete="off"
                     className="w-full px-3 py-2.5 rounded-xl text-sm text-white placeholder-purple-400/50 transition-all"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                     onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
@@ -143,6 +145,7 @@ export function AddTodoModal({ store }: { store: AppStore }) {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Add more details..."
                     rows={2}
+                    maxLength={1000}
                     className="w-full px-3 py-2.5 rounded-xl text-sm text-white placeholder-purple-400/50 resize-none transition-all"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                     onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
